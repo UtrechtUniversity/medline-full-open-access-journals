@@ -18,7 +18,7 @@ jobs:
             - name: Run python script
               run: |
                 python main.py
-                cp index.html output/index.html
+                sed "s/[[LASTUPDATED]]/$(date '+%Y-%m-%d')/g" index.html > output/index.html
             - name: Upload Pages artifact
               uses: actions/upload-pages-artifact@v4
               with:

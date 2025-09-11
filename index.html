@@ -86,7 +86,7 @@
         <div id="myGrid"></div>
       </div>
       <div class="footer">
-        <p>Data is licensed under <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank">CC BY-SA 4.0</a> | Source code is licensed under an MIT license</p>
+        <p>Data is licensed under <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank">CC BY-SA 4.0</a> | <a href="https://github.com/rhoitink/medline-full-open-access-journals" target="_blank">Source code</a> is licensed under an MIT license</p> | Last updated: [[LASTUPDATED]]
       </div>
 
         <script type="text/javascript">
@@ -156,7 +156,7 @@
           myGrid = agGrid.createGrid(myGridElement, gridOptions);
 
           
-        fetch('/full_OA_journal_in_MEDLINE.json')
+        fetch('full_OA_journal_in_MEDLINE.json')
           .then(response => response.json())
           .then((data) => myGrid.setGridOption('rowData', data))
         });
