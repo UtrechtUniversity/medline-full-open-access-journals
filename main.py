@@ -51,5 +51,15 @@ doaj_medline_intersection = doaj_journals.filter(
 
 # save files
 doaj_medline_intersection.write_excel(output_path / "full_OA_journal_in_MEDLINE.xlsx")
-doaj_medline_intersection.write_json(output_path / "full_OA_journal_in_MEDLINE.json")
+doaj_medline_intersection.select(
+    pl.col("journal_title"),
+    pl.col("apc"),
+    pl.col("has_other_fees"),
+    pl.col("publisher"),
+    pl.col("subjects"),
+    pl.col("apc_amount"),
+    pl.col("languages_in_which_the_journal_accepts_manuscripts"),
+    pl.col("url_in_doaj"),
+    pl.col("journal_url"),
+).write_json(output_path / "full_OA_journal_in_MEDLINE.json")
 print(f"Journal lists combined and written to {output_path} folder")
