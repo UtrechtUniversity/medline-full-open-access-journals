@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>List of full open access journals in MEDLINE</title>
+        <!-- Includes all JS & CSS for the JavaScript Data Grid -->
+    <script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.js"></script>
+    <style>
+      body {
+      font-family: Arial, Helvetica, sans-serif;
+    }
+    html, body {
+    margin: 0;
+    height: 100%;
+  }
+  h1 {
+  margin-bottom: 0px;
+}
+  .button-group {
+    display: inline-block;
+    border-right: 1px solid black;
+    margin: 5px 5px 0px 0px;
+    padding-right: 5px;
+  }
+  .button-group:last-child{
+    border-right: none;
+  }
+    .button-group button{
+      background: #fff;
+      border: 1px solid #000;
+      padding: .5rem;
+      margin: .5rem;
+      border-radius: 5px;
+    }
+    .button-group h3{
+      display: inline-block;
+      margin: 0px 10px 0px 0px;
+    }
+    h2 {
+      margin: 5px 0px;;
+    }
+    .wrapper{
+      height: 100%; 
+      width: 90%;
+      margin: 0 auto;
+      display: flex; 
+      flex-direction: column;
+    }
+    .grid-wrapper{
+      flex-grow: 1;
+      height: 10px;
+      min-height:300px;
+    }
+    #myGrid {
+    height: 100%;
+  }
+  .footer {
+  font-size: 10pt;
+}
+
+    </style>
+
+</head>
+<body>
+  <div class="wrapper">
+      <div>
+      <h1>List of full open access journals indexed in MEDLINE</h1>
+      <p>The table below lists all journals that are full open access according to the <a href="https://doaj.org" target="_blank">DOAJ</a> and indexed in <a href="https://www.nlm.nih.gov/medline/medline_home.html" target="_blank">MEDLINE</a> (PubMed). To compile this list, two datasources were used: DOAJ journal-level metadata through their <a href="https://doaj.org/docs/public-data-dump/" target="_blank">csv export</a> (<a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank">CC BY-SA 4.0</a>) and the <a href="https://ftp.ncbi.nlm.nih.gov/pubmed/J_Medline.txt" target="_blank">MEDLINE journal list</a>, provided by the <a href="https://www.nlm.nih.gov/" target="_blank">National Library of Medicine (NLM)</a>.  The full dataset can be downloaded as an excel file through <a href="/full_OA_journal_in_MEDLINE.xlsx">this link</a> (licence: <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank">CC BY-SA 4.0</a>)</p>
+      </div>
+      <div>    
+        <h2>Filtering</h2>
+        <div class="button-group">
+            <h3>APCs and other charges:</h3>
+            <button onclick="withoutFees()">Without APCs or other fees</button>
+            <button onclick="clearFees()">Clear fees filter</button>
+        </div>
+        <div class="button-group">
+            <h3>Subjects:</h3>
+            <button onclick="subjectMedicine()">Medicine</button>
+            <button onclick="allSubjects()">Clear subjects</button>
+        </div>
+      </div>
+
+      <div class="grid-wrapper">
+        <div id="myGrid"></div>
+      </div>
+      <div class="footer">
+        <p>Data is licensed under <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank">CC BY-SA 4.0</a> | Source code is licensed under an MIT license</p>
+      </div>
+
+        <script type="text/javascript">
+        // Your Javascript code to create the Data Grid
+        const myGridElement = document.querySelector('#myGrid');
+        let myGrid;
+
+        function URLsformatter(params){
+          const link = '<a href="'+params.value[0]+'" target="_blank">DOAJ</a> | <a href="'+params.value[1]+'" target="_blank">Journal</a> ';
+          return link;
+        }
+
+        // Grid Options: Contains all of the Data Grid configurations
+          const gridOptions = {
+              rowData: [],
+              columnDefs: [
+                  { field: "journal_title", headerName:"Journal title", filter: "agTextColumnFilter", floatingFilter: true },
+                  { field: "apc" , filter: "agTextColumnFilter", headerName: "APCs", floatingFilter: true},
+                  { field: "has_other_fees", filter: "agTextColumnFilter", floatingFilter: true, headerName: "Other fees"},
+                  { field: "publisher", filter: "agTextColumnFilter", floatingFilter: true  },
+                  { field: "subjects", filter: "agTextColumnFilter", floatingFilter: true },
+                  { field: "apc_amount", headerName: "APC amount"},
+                  { field: "languages_in_which_the_journal_accepts_manuscripts", headerName: "Languages", filter: true, floatingFilter: true},
+                  { field: "urls", headerName: "URLs", valueGetter: params => [params.data.url_in_doaj, params.data.journal_url],
+                cellRenderer: URLsformatter }
+                ],
+              pagination: true,
+          }
+          
+        function withoutFees() {
+          myGrid
+            .setColumnFilterModel("apc", {
+              type: "equals",
+              filter: "No"
+            });
+          myGrid
+            .setColumnFilterModel("has_other_fees", {
+              type: "equals",
+              filter: "No"
+            })
+            .then(() => {
+              myGrid.onFilterChanged();
+            });
+        }
+        function clearFees() {
+          myGrid.destroyFilter("apc");
+          myGrid.destroyFilter("has_other_fees");
+        }
+                    
+        function subjectMedicine() {
+          myGrid
+            .setColumnFilterModel("subjects", {
+              type: "contains",
+              filter: "Medicine"
+            })
+            .then(() => {
+              myGrid.onFilterChanged();
+            });
+        }
+        function allSubjects() {
+          myGrid
+            .destroyFilter("subjects")
+        }
+
+        // setup the grid after the page has finished loading
+        document.addEventListener("DOMContentLoaded", function () {
+          myGrid = agGrid.createGrid(myGridElement, gridOptions);
+
+          
+        fetch('/full_OA_journal_in_MEDLINE.json')
+          .then(response => response.json())
+          .then((data) => myGrid.setGridOption('rowData', data))
+        });
+        </script>
+</body>
+</html>
