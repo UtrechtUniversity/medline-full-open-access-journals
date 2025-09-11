@@ -1,6 +1,11 @@
 name: Build and publish to GitHub pages
 
-on: [push, pull_request]
+on: 
+  push:
+  pull_request:
+  schedule:
+    - cron: '0 8 * * 0' # weekly, Sunday at 8AM
+
 
 jobs:
     build:
