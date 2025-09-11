@@ -61,5 +61,8 @@ doaj_medline_intersection.select(
     pl.col("languages_in_which_the_journal_accepts_manuscripts"),
     pl.col("url_in_doaj"),
     pl.col("journal_url"),
+    pl.col("journal_license"),
+    pl.col("journal_issn_print_version"),
+    pl.col("journal_eissn_online_version"),
 ).write_json(output_path / "full_OA_journal_in_MEDLINE.json")
 print(f"Journal lists combined and written to {output_path} folder")

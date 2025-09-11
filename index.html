@@ -99,6 +99,10 @@
           return link;
         }
 
+        function ISSNsformatter(params){
+          return params.value.filter(e => typeof e === 'string' && e).join(', ')
+        }
+
         // Grid Options: Contains all of the Data Grid configurations
           const gridOptions = {
               rowData: [],
@@ -111,7 +115,9 @@
                   { field: "apc_amount", headerName: "APC amount"},
                   { field: "languages_in_which_the_journal_accepts_manuscripts", headerName: "Languages", filter: true, floatingFilter: true},
                   { field: "urls", headerName: "URLs", valueGetter: params => [params.data.url_in_doaj, params.data.journal_url],
-                cellRenderer: URLsformatter }
+                cellRenderer: URLsformatter },
+                  { field: "journal_license", filter: true, floatingFilter: true, headerName: "License" },
+                  { field: "issns", filter: true, floatingFilter: true, headerName: "ISSNs", valueGetter: params => [params.data.journal_issn_print_version,params.data.journal_eissn_online_version], cellRenderer: ISSNsformatter }
                 ],
               pagination: true,
           }
