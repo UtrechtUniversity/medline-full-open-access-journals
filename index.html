@@ -100,7 +100,7 @@
           href="https://ftp.ncbi.nlm.nih.gov/pubmed/J_Medline.txt" target="_blank">MEDLINE journal list</a>, provided by
         the <a href="https://www.nlm.nih.gov/" target="_blank">National Library of Medicine (NLM)</a>. The full dataset
         can be downloaded as an excel file through <a href="full_OA_journal_in_MEDLINE.xlsx">this link</a> (licence: <a
-          href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank">CC BY-SA 4.0</a>).</p>
+          href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank">CC BY-SA 4.0</a>). Please be aware that it may include some journals that were/are only partially indexed, always check the NLM catalog (through the ISSNs) to be sure.</p>
     </div>
     <div class="filtering">
       <h2>Filtering</h2>
@@ -144,7 +144,8 @@
     }
 
     function ISSNsformatter(params) {
-      return params.value.filter(e => typeof e === 'string' && e).join(', ')
+      let issns = params.value.filter(e => typeof e === 'string' && e);
+      return '<a href="https://www.ncbi.nlm.nih.gov/nlmcatalog/?term='+issns.join('+OR+')+'" target="_blank">'+issns.join(', ')+'</a>';
     }
 
     // Grid Options: Contains all of the Data Grid configurations
