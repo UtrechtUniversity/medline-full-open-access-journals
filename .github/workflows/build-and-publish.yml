@@ -2,6 +2,8 @@ name: Build and publish to GitHub pages
 
 on: 
   push:
+    branches:
+      - 'main'
   pull_request:
   schedule:
     - cron: '0 8 * * 0' # weekly, Sunday at 8AM
@@ -12,6 +14,8 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v5
+              with:
+                ref: main
             - uses: actions/setup-python@v6
               name: Setup python 3.12
               with:
