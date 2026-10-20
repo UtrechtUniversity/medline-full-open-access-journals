@@ -3,8 +3,9 @@ import polars as pl
 from pathlib import Path
 import re
 import os
+import time
 
-if "OPENALEX_API_KEY" not in os.environ:
+if "OPENALEX_API_KEY" not in os.environ or os.environ.get("OPENALEX_API_KEY", "") == "":
     import sys
 
     print(
@@ -27,20 +28,53 @@ doaj_file.write_text(doaj_journal_list, encoding="UTF-8")
 
 print("Downloaded dataset from DOAJ")
 
+
 # Download ISSNs from OpenAlex medline index
+def fetch_with_retry(url, parameters, max_retries=5):
+    for attempt in range(max_retries):
+        try:
+            response = requests.get(url, params=parameters, timeout=30)
+
+            if response.status_code == 200:
+                return response.json()
+
+            if response.status_code == 429:
+                # Rate limited - wait longer
+                wait_time = 2**attempt
+                time.sleep(wait_time)
+                continue
+
+            if response.status_code >= 500:
+                # Server error - retry
+                wait_time = 2**attempt
+                time.sleep(wait_time)
+                continue
+
+            # Client error - don't retry
+            response.raise_for_status()
+
+        except requests.exceptions.Timeout:
+            if attempt < max_retries - 1:
+                time.sleep(2**attempt)
+            else:
+                raise
+
+    raise Exception(f"Failed after {max_retries} retries")
+
+
 cursor = "*"
 ISSNs = []
 while cursor:
-    r = requests.get(
-        f"https://api.openalex.org/sources",
-        params={
+    r = fetch_with_retry(
+        "https://api.openalex.org/sources",
+        {
             "filter": "listed_in:medline",
             "select": "issn",
             "per_page": 100,
             "cursor": cursor,
             "api_key": os.environ.get("OPENALEX_API_KEY"),
         },
-    ).json()
+    )
 
     for res in r["results"]:
         ISSNs.extend(res["issn"])
