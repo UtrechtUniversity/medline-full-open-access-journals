@@ -25,6 +25,8 @@ jobs:
                 python -m pip install --upgrade pip
                 python -m pip install .
             - name: Run python script
+              env:
+                OPENALEX_API_KEY: ${{ secrets.OPENALEX_API_KEY }}
               run: |
                 python main.py
                 sed "s/LASTUPDATED/$(date '+%Y-%m-%d')/g" index.html > output/index.html
